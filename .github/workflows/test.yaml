@@ -1,0 +1,43 @@
+name: Test Cloudflare Cache Purge Action
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - name: Checkout Repo
+        id: checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        id: setup-node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+      - name: Install Dependencies
+        id: install-dependencies
+        run: npm install
+      - name: Build Action
+        id: build-action
+        run: npx ncc build src/index.js -o dist
+      - name: Run Cloudflare Cache Purge Action
+        id: cloudflare-cache-purge
+        uses: ./
+        with:
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          purge-urls: '["https://api.yashrajdighe.in"]'
+      - name: Print Purge IDs
+        run: |
+          echo "Purge IDs: ${{ steps.cloudflare-cache-purge.outputs.purge-ids }}"

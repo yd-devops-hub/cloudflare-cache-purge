@@ -1,0 +1,15 @@
+name: "Cloudflare Cache Purge Action"
+description: "Purges Cloudflare cache for a given zone and list of URLs"
+inputs:
+  cloudflare-api-token:
+    description: "The Cloudflare API token with Zone Read and Cache Purge permissions"
+    required: true
+  purge-urls:
+    description: 'JSON array of URLs to purge, e.g. ''["https://example.com/index.html"]'''
+    required: true
+outputs:
+  purge-ids:
+    description: "JSON array of Cloudflare purge operation IDs, one per zone purged"
+runs:
+  using: "node24"
+  main: "dist/index.js"
