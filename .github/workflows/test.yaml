@@ -37,7 +37,7 @@ jobs:
         uses: ./
         with:
           cloudflare-api-token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          purge-urls: '["https://yashrajdighe.in/index.html"]'
+          purge-urls: '["https://api.yashrajdighe.in"]'
       - name: Print Purge IDs
         run: |
           echo "Purge IDs: ${{ steps.cloudflare-cache-purge.outputs.purge-ids }}"
