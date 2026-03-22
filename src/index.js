@@ -2,6 +2,8 @@ const core = require('@actions/core');
 
 const CLOUDFLARE_API_BASE = 'https://api.cloudflare.com/client/v4';
 
+const maskId = (id) => `****${id.slice(-4)}`;
+
 /**
  * Walks hostname parts from most-specific to least-specific (e.g.
  * sub.example.com → example.com) until a matching active Cloudflare zone
@@ -34,7 +36,7 @@ async function resolveZoneId(apiToken, hostname, cache) {
 
     if (data.result.length > 0) {
       const zoneId = data.result[0].id;
-      core.info(`  Resolved zone for "${candidate}": ${zoneId}`);
+      core.info(`  Resolved zone for "${candidate}": ${maskId(zoneId)}`);
       cache.set(candidate, zoneId);
       cache.set(hostname, zoneId);
       return zoneId;
@@ -86,7 +88,7 @@ async function run() {
     const purgeIds = [];
 
     for (const [zoneId, urls] of urlsByZone) {
-      core.info(`Purging ${urls.length} URL(s) from zone ${zoneId}:`);
+      core.info(`Purging ${urls.length} URL(s) from zone ${maskId(zoneId)}:`);
       urls.forEach((u) => core.info(`  - ${u}`));
 
       const response = await fetch(
