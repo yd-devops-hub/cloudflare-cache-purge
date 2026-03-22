@@ -1,0 +1,62 @@
+name: Release Manager
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    # if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        id: checkout
+        uses: actions/checkout@v6
+      - name: Setup Node
+        id: setup-node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "npm"
+      - name: Install Dependencies
+        id: install-dependencies
+        run: npm install
+      - name: Build Action
+        id: build-action
+        run: npx ncc build src/index.js -o dist
+      - name: Run SemVer Tag Manager Action
+        id: semver-tag-manager
+        uses: yd-devops-hub/semver-tag-manager@v1
+        with:
+          dry-run: true
+      - name: Create Tag and Release
+        id: create-tag-and-release
+        env:
+          NEW_TAG: ${{ steps.semver-tag-manager.outputs.new-tag }}
+          MAJOR_TAG: ${{ steps.semver-tag-manager.outputs.major-tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f dist/
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: bundle dist for release ${NEW_TAG} [skip ci]"
+          fi
+          git tag -a "${NEW_TAG}" -m "Release ${NEW_TAG}"
+          if [ -n "${MAJOR_TAG}" ]; then
+            git tag -fa "${MAJOR_TAG}" -m "Release ${NEW_TAG}"
+          fi
+          git push origin "${NEW_TAG}"
+          if [ -n "${MAJOR_TAG}" ]; then
+            git push -f origin "${MAJOR_TAG}"
+          fi
+          gh release create "${NEW_TAG}" \
+            --title "${NEW_TAG}" \
+            --generate-notes \
+            --latest
