@@ -107,13 +107,13 @@ async function run() {
 
       if (!data.success) {
         const errors = (data.errors ?? []).map((e) => `[${e.code}] ${e.message}`).join('; ');
-        core.setFailed(`Cache purge failed for zone ${zoneId}: ${errors || 'unknown error'}`);
+        core.setFailed(`Cache purge failed for zone ${maskId(zoneId)}: ${errors || 'unknown error'}`);
         return;
       }
 
       const purgeId = data.result?.id ?? '';
-      core.info(`  Purge successful! Purge ID: ${purgeId}`);
-      purgeIds.push(purgeId);
+      core.info(`  Purge successful! Purge ID: ${maskId(purgeId)}`);
+      purgeIds.push(maskId(purgeId));
     }
 
     core.setOutput('purge-ids', JSON.stringify(purgeIds));
