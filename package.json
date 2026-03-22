@@ -1,0 +1,27 @@
+{
+  "name": "cloudflare-cache-purge",
+  "version": "1.0.0",
+  "description": "A GitHub Action written in JavaScript to automatically purge Cloudflare cache.",
+  "main": "index.js",
+  "scripts": {
+    "build": "ncc build src/index.js -o dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yd-devops-hub/cloudflare-cache-purge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yd-devops-hub/cloudflare-cache-purge/issues"
+  },
+  "homepage": "https://github.com/yd-devops-hub/cloudflare-cache-purge#readme",
+  "dependencies": {
+    "@actions/core": "^2.0.3"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.4"
+  }
+}
